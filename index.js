@@ -11,4 +11,14 @@ program
 let firstFile = program.input;
 let secondFile = program.output;
 
-console.log(_.isEqual(firstFile, secondFile))''
+// console.log(_.isEqual(firstFile, secondFile));
+
+if(!_.isEqual(firstFile, secondFile)) {
+    let yo = _.reduce(firstFile, function(result, value, key) {
+        return _.isEqual(value, secondFile[key]) ?
+            result : result.concat(key);
+    }, []);
+    console.log('Here is the diff: ', yo)
+} else {
+    console.log('Files are identical!!')
+}
