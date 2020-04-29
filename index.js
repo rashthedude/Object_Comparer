@@ -1,5 +1,6 @@
 const program = require('commander');
 const _ = require('lodash');
+const fs = require('fs');
 
 program
     .version('1.0.0')
@@ -11,14 +12,26 @@ program
 let firstFile = program.input;
 let secondFile = program.output;
 
-// console.log(_.isEqual(firstFile, secondFile));
+let rawFirstFile = fs.readFileSync(firstFile);
+let formattedFirstFile = JSON.parse(rawFirstFile);
 
-if(!_.isEqual(firstFile, secondFile)) {
-    let yo = _.reduce(firstFile, function(result, value, key) {
-        return _.isEqual(value, secondFile[key]) ?
-            result : result.concat(key);
-    }, []);
-    console.log('Here is the diff: ', yo)
+let rawSecondFile = fs.readFileSync(secondFile);
+let formattedSecondFile = JSON.parse(rawSecondFile);
+
+
+function difference(formattedFirstFile, formattedSecondFile) {
+	function changes(formattedFirstFile, formattedSecondFile) {
+		return _.transform(formattedFirstFile, function(result, value, key) {
+			if (!_.isEqual(value, formattedSecondFile[key])) {
+				result[key] = (_.isObject(value) && _.isObject(base[key])) ? changes(value, base[key]) : value;
+			}
+		});
+	}
+	return changes(formattedFirstFile, formattedSecondFile);
+}
+
+if(!_.isEqual(formattedFirstFile, formattedSecondFile)) {
+    console.log('diff: ', difference(formattedFirstFile, formattedSecondFile))
 } else {
     console.log('Files are identical!!')
 }
