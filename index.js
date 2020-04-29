@@ -19,7 +19,7 @@ let rawSecondFile = fs.readFileSync(secondFile);
 let formattedSecondFile = JSON.parse(rawSecondFile);
 
 
-function difference(formattedFirstFile, formattedSecondFile) {
+const difference = (formattedFirstFile, formattedSecondFile) => {
 	function changes(formattedFirstFile, formattedSecondFile) {
 		return _.transform(formattedFirstFile, function(result, value, key) {
 			if (!_.isEqual(value, formattedSecondFile[key])) {
@@ -31,7 +31,7 @@ function difference(formattedFirstFile, formattedSecondFile) {
 }
 
 if(!_.isEqual(formattedFirstFile, formattedSecondFile)) {
-    console.log('diff: ', difference(formattedFirstFile, formattedSecondFile))
+    console.log('Diff: ', difference(formattedFirstFile, formattedSecondFile))
 } else {
     console.log('Files are identical!!')
 }
