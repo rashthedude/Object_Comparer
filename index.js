@@ -1,16 +1,18 @@
 const program = require('commander');
 const _ = require('lodash');
 const fs = require('fs');
+chalk = require('chalk');
+log = console.log;
 
 program
     .version('1.0.0')
-    .option('-i, --input [files]', 'first file')
-    .option('-o, --output [files]', 'second file')
+    .option('-f, --first [files]', 'first file')
+    .option('-s, --second [files]', 'second file')
     .parse(process.argv)
 
 
-let firstFile = program.input;
-let secondFile = program.output;
+let firstFile = program.first;
+let secondFile = program.second;
 
 let rawFirstFile = fs.readFileSync(firstFile);
 let formattedFirstFile = JSON.parse(rawFirstFile);
@@ -31,7 +33,7 @@ const difference = (formattedFirstFile, formattedSecondFile) => {
 }
 
 if(!_.isEqual(formattedFirstFile, formattedSecondFile)) {
-    console.log('Diff: ', difference(formattedFirstFile, formattedSecondFile))
+    log(chalk.red('Diff: '), difference(formattedFirstFile, formattedSecondFile));
 } else {
-    console.log('Files are identical!!')
+    log(chalk.green('Files are identical!!'));
 }
