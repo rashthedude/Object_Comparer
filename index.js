@@ -25,7 +25,7 @@ const difference = (formattedFirstFile, formattedSecondFile) => {
 	function changes(formattedFirstFile, formattedSecondFile) {
 		return _.transform(formattedFirstFile, function(result, value, key) {
 			if (!_.isEqual(value, formattedSecondFile[key])) {
-				result[key] = (_.isObject(value) && _.isObject(base[key])) ? changes(value, base[key]) : value;
+				result[key] = (_.isObject(value) && _.isObject(formattedFirstFile[key])) ? changes(value, formattedFirstFile[key]) : value;
 			}
 		});
 	}
