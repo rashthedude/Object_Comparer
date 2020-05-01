@@ -21,19 +21,51 @@ let rawSecondFile = fs.readFileSync(secondFile);
 let formattedSecondFile = JSON.parse(rawSecondFile);
 
 
-const difference = (formattedFirstFile, formattedSecondFile) => {
-	function changes(formattedFirstFile, formattedSecondFile) {
-		return _.transform(formattedFirstFile, function(result, value, key) {
-			if (!_.isEqual(value, formattedSecondFile[key])) {
-				result[key] = (_.isObject(value) && _.isObject(formattedFirstFile[key])) ? changes(value, formattedFirstFile[key]) : value;
-			}
-		});
-	}
-	return changes(formattedFirstFile, formattedSecondFile);
-}
+function get(obj, path) {
+	return path.split('.').reduce((r, e) => {
+	  if (!r) return r;
+	  else return r[e] || undefined;
+	}, obj);
+  }
+  
+  function isEmpty(o) {
+	if (typeof o !== 'object') return true;
+	else return !Object.keys(o).length;
+  }
+  
+  function build(a, b, o = null, prev = '') {
+	return Object.keys(a).reduce(
+	  (r, e) => {
+		const path = prev + (prev ? '.' + e : e);
+		const bObj = get(b, path);
+		const value = a[e] === bObj;
+  
+		if (typeof a[e] === 'object') {
+		  if (isEmpty(a[e]) && isEmpty(bObj)) {
+			if (e in r) r[e] = r[e];
+			else r[e] = true;
+		  } else if (!bObj && isEmpty(a[e])) {
+			r[e] = value;
+		  } else {
+			r[e] = build(a[e], b, r[e], path);
+		  }
+		} else {
+		  r[e] = value;
+		}
+		return r;
+	  },
+	  o ? o : {}
+	);
+  }
+  
+  function compare(a, b) {
+	const o = build(a, b);
+	return build(b, a, o);
+  }
+
 
 if(!_.isEqual(formattedFirstFile, formattedSecondFile)) {
-    log(chalk.red('Diff: '), difference(formattedFirstFile, formattedSecondFile));
+    log(chalk.red('Diff: '), compare(formattedFirstFile, formattedSecondFile));
 } else {
     log(chalk.green('Files are identical!!'));
 }
